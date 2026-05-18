@@ -1,0 +1,128 @@
+
+[
+    {
+        "id" : 1,
+        "name": "Bell",
+        "curse_amount": 3,
+        "start_level": 1
+    },
+
+    {
+        "id" : 2,
+        "name": "Mart",
+        "curse_amount": 3,
+        "start_level": 1
+    },
+
+    {
+        "id" : 3,
+        "name": "Baby",
+        "curse_amount": 3,
+        "start_level": 1
+    },
+
+    {
+        "id" : 4,
+        "name": "ICBM",
+        "curse_amount": 3,
+        "start_level": 1
+    },
+
+    {
+        "id" : 5,
+        "name": "Husk",
+        "curse_amount": 7,
+        "start_level": 1
+    },
+
+    {
+        "id" : 6,
+        "name": "Springer",
+        "curse_amount": 2,
+        "start_level": 1
+    },
+
+    {
+        "id" : 7,
+        "name": "Flesh",
+        "curse_amount": 3,
+        "start_level": 5
+    },
+
+    {
+        "id" : 8,
+        "name": "Operator",
+        "curse_amount": 1,
+        "start_level": 5
+    },
+
+    {
+        "id" : 9,
+        "name": "Guardian",
+        "curse_amount": 2,
+        "start_level": 8
+    },
+
+    {
+        "id" : 10,
+        "name": "Telefragger",
+        "curse_amount": 2,
+        "start_level": 8
+    },
+
+    {
+        "id" : 11,
+        "name": "Voidbound Baby",
+        "curse_amount": 3,
+        "start_level": 10
+    },
+
+    {
+        "id" : 12,
+        "name": "Kolóna",
+        "curse_amount": 2,
+        "start_level": 10
+    },
+
+    {
+        "id" : 13,
+        "name": "Void Breaker",
+        "curse_amount": 3,
+        "start_level": 15
+    },
+
+    {
+        "id" : 14,
+        "name": "Cadence",
+        "curse_amount": 1,
+        "start_level": 15
+    },
+
+    {
+        "id" : 15,
+        "name": "Sigil",
+        "curse_amount": 0,
+        "start_level": 15
+    },
+
+    {
+        "id" : 16,
+        "name": "Voidbound Guardian",
+        "curse_amount": 2,
+        "start_level": 20
+    },
+
+    {
+        "id" : 17,
+        "name": "Scrapmaw",
+        "curse_amount": 0,
+        "start_level": 20
+    },
+
+    {
+        "id" : 18,
+        "name": "The Celestial",
+        "curse_amount": 0,
+        "start_level": 40
+    }
+]
