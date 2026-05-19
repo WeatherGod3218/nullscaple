@@ -19,12 +19,21 @@ func GetEnemies(c *gin.Context) {
 
 func GuessEnemy(c *gin.Context) {
 	enemyId := c.PostForm("enemy-id")
+	gameplayMode := c.PostForm("gameplay-mode")
+
+	if !enemies.CheckIfStringIsMode(gameplayMode) {
+		logging.Logger.WithFields(logrus.Fields{"module": "api", "method": "Guessenemy"}).Warn(fmt.Sprintf("Failed to find the gamemode marked with the %d", gameplayMode))
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Unable to process the request!",
+		})
+		return
+	}
 
 	enemyIndex, err := strconv.Atoi(enemyId)
 	if err != nil {
 		logging.Logger.WithFields(logrus.Fields{"module": "api", "method": "Guessenemy"}).Warn(fmt.Sprintf("Failed to convert the id %s", enemyId))
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": fmt.Sprintf("Failed to convert the id %s", enemyId),
+			"error": "Unable to process the request!",
 		})
 		return
 	}
@@ -33,12 +42,12 @@ func GuessEnemy(c *gin.Context) {
 	if foundEnemy == nil {
 		logging.Logger.WithFields(logrus.Fields{"module": "api", "method": "Guessenemy"}).Warn(fmt.Sprintf("Failed to find enemy with the id %d", enemyIndex))
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": fmt.Sprintf("Failed to find enemy with the id %d", enemyIndex),
+			"error": "Unable to process the request!",
 		})
 		return
 	}
 
-	baseEnemy := enemies.GetEnemyOfTheDay()
+	baseEnemy := enemies.GetEnemyOfTheDay(gameplayMode)
 	guessResult := enemies.CompareEnemies(*foundEnemy, *baseEnemy)
 
 	c.JSON(http.StatusOK, gin.H{
@@ -47,7 +56,16 @@ func GuessEnemy(c *gin.Context) {
 }
 
 func GetTodaysEnemy(c *gin.Context) {
-	baseEnemy := enemies.GetEnemyOfTheDay()
+	gameplayMode := c.PostForm("gameplay-mode")
+	if !enemies.CheckIfStringIsMode(gameplayMode) {
+		logging.Logger.WithFields(logrus.Fields{"module": "api", "method": "Guessenemy"}).Warn(fmt.Sprintf("Failed to find the gamemode marked with the %d", gameplayMode))
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Unable to process the request!",
+		})
+		return
+	}
+
+	baseEnemy := enemies.GetEnemyOfTheDay(gameplayMode)
 	c.JSON(http.StatusOK, gin.H{
 		"enemy": baseEnemy,
 	})

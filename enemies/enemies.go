@@ -18,6 +18,12 @@ const (
 	Lower  Comparison = "lower"
 )
 
+var ValidModes = map[string]bool{
+	"casual":   true,
+	"standard": true,
+	"extreme":  true,
+}
+
 type EnemyData struct {
 	Id          int    `json:"id"`
 	Name        string `json:"name"`
@@ -77,12 +83,15 @@ func InitEnemies() {
 	logging.Logger.WithFields(logrus.Fields{"module": "enemies", "method": "InitEnemies"}).Info("Succesfully loaded all enemies!")
 }
 
-func GetEnemyOfTheDay() *EnemyData {
+func GetEnemyOfTheDay(mode string) *EnemyData {
 	if len(EnemyList) == 0 {
 		logging.Logger.WithFields(logrus.Fields{"module": "enemies", "method": "GetEnemyOfTheDay"}).Warn("enemy list is empty, returning fake enemy!")
 		return nil
 	}
-	dayHash := hashString(time.Now().Format("2006-1-2"))
+
+	currentDay := time.Now().Format("2006-1-2")
+	inputString := mode + os.Getenv("ENEMY_HASH_SALT") + currentDay
+	dayHash := hashString(inputString)
 
 	index := int(dayHash) % len(LoadedEnemies)
 	return LoadedEnemies[index]
@@ -118,4 +127,9 @@ func GetEnemyList() map[int]string {
 		return make(map[int]string)
 	}
 	return EnemyList
+}
+
+func CheckIfStringIsMode(mode string) bool {
+	_, exists := ValidModes[mode]
+	return exists
 }
