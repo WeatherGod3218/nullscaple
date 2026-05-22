@@ -1,0 +1,201 @@
+{{ define "index.tmpl"}}
+{{ template "header.tmpl" . }}
+    
+    <div class="container-xl">
+        <div class="row border-bottom mb-2 pb-2">
+            <div class="col-6 d-flex flex-column text-center">
+                <div class="mb-3">
+                    <div class="dropdown">
+
+                        <input 
+                            class="enemySearch mt-3 form-control w-75 mx-auto dropdown-toggle" 
+                            type="text" 
+                            placeholder="Find Enemy"
+                            id="enemyDropdown"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
+
+                        <ul class="dropdown-menu w-75 overflow-auto" aria-labelledby="enemyDropdown" style="max-height: 420px;">
+
+                            {{ range $i, $enemy := .Enemies }}
+                            <li data-enemy-id="{{$enemy.Id}}">
+
+                                <button 
+                                    class="dropdown-item enemy-select-dropdown d-flex align-items-center gap-2 "
+                                    data-enemy-id="{{$enemy.Id}}"
+                                    data-enemy-file="/static/images/enemies/{{$enemy.Filename}}"
+                                    type="button">
+
+                                    <img
+                                        src="/static/images/enemies/{{$enemy.Filename}}"
+                                        alt="{{$enemy.Name}}"
+                                        width="40"
+                                        height="40"
+                                        loading="lazy" 
+                                        decoding="async"
+                                        class="rounded">
+
+                                    <span class="enemy-names">{{$enemy.Name}}</span>
+
+                                </button>
+
+                            </li>
+                            {{ end }}
+
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 d-flex justify-content-center align-items-center" style="height: 420px;">
+                <img 
+                    id="largeEnemyDisplay" 
+                    src="/static/images/enemies/bell.png" 
+                    alt="Selected Enemy" 
+                    width="400" 
+                    height="400"
+                    class="rounded"
+                >
+            </div>
+        </div>
+        <div class="row border-bottom mb-2"> 
+            <div class="container-xl">
+                <div class="row border mb-2 w-100">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-3 d-flex justify-content-center align-items-center" style="height: 80px;">
+                        <span class="enemy-names">Enemy Name</span>
+                    </div>
+                    <div class="col-md-2 border d-flex justify-content-center align-items-center" style="height: 80px;">
+                        <span class="enemy-names">Curse Amount</span>
+                    </div>
+                    <div class="col-md-2 border d-flex justify-content-center align-items-center" style="height: 80px;">
+                        <span class="enemy-names">Start Level</span>
+                    </div>
+                    <div class="col-md-2 border d-flex justify-content-center align-items-center" style="height: 80px;">
+                        <span class="enemy-names">Kill Method</span>
+                    </div>
+                </div>
+                <ul class="chosen-enemies w-50 overflow-auto list-unstyled m-0 p-0" style="max-height: 420px;">
+                </ul>
+            </div>
+        </div>
+        <script>
+        (() => {
+            'use strict'
+            const guessedEnemies = new Set();
+
+
+            function createEnemyRow(enemy) {
+                const li = document.createElement("li");
+
+                const container = document.createElement("div");
+                container.className = "container-xl";
+
+                const row = document.createElement("div");
+                row.className = "row border mb-2 ps-2";
+
+                const imgCol = document.createElement("div");
+                imgCol.className = "col-md-1 d-flex justify-content-center align-items-center";
+                imgCol.style.height = "80px";
+
+                const img = document.createElement("img");
+                img.src = `/static/images/enemies/${enemy.filename}`;
+                img.alt = "Chosen Enemy";
+                img.width = 60;
+                img.height = 60;
+                img.className = "rounded";
+
+                imgCol.appendChild(img);
+
+                const nameCol = document.createElement("div");
+                nameCol.className = "col-md-4 d-flex justify-content-center text-center align-items-center";
+                nameCol.style.height = "80px";
+                nameCol.innerHTML = `<span class="enemy-names fs-3">${enemy.name}</span>`;
+
+                const curseCol = document.createElement("div");
+                curseCol.className = "col-md-2 border d-flex justify-content-center align-items-center wrong-answer-background";
+                curseCol.style.height = "80px";
+                curseCol.innerHTML = `<span class="enemy-names wrong-answer-text fs-1">${enemy.curse_amount}</span>`;
+
+                const levelCol = document.createElement("div");
+                levelCol.className = "col-md-2 border d-flex justify-content-center align-items-center partial-answer-background";
+                levelCol.style.height = "80px";
+                levelCol.innerHTML = `<span class="enemy-names partial-answer-text fs-2">${enemy.start_level}</span>`;
+
+                const killCol = document.createElement("div");
+                killCol.className = "col-md-3 border d-flex justify-content-center align-items-center correct-answer-background";
+                killCol.style.height = "80px";
+                killCol.innerHTML = `<span class="enemy-names correct-answer-text fs-3">${enemy.kill_method}</span>`;
+
+                row.appendChild(imgCol);
+                row.appendChild(nameCol);
+                row.appendChild(curseCol);
+                row.appendChild(levelCol);
+                row.appendChild(killCol);
+
+                container.appendChild(row);
+                li.appendChild(container);
+
+                return li;
+            }
+
+            async function submitEnemy(enemyId) {
+                try {
+                    console.log(enemyId)
+                    const res = await fetch('/guess-enemy', { method: 'POST', body: JSON.stringify({ "enemy_id": enemyId, "gameplay_mode": "casual"}) });
+                    const data = await res.json();
+                    console.log(data)
+
+                    const list = document.querySelector(".chosen-enemies");
+                    list.appendChild(createEnemyRow(data.enemy));
+
+                    console.log(data.enemy.id)
+                    console.log(typeof(data.enemy.id))
+
+                    guessedEnemies.add(data.enemy.id)
+                    return res 
+                } catch (err) {
+                    console.log(err);
+                }
+            }
+
+            function handleSearchbar() {
+                const query = this.value.toLowerCase();
+
+                document.querySelectorAll('ul.dropdown-menu li').forEach(li => {
+                    const span = li.querySelector('span.enemy-names');
+
+                    if (!span) return;
+
+                    const enemyName = span.textContent.toLowerCase();
+                    li.style.display = enemyName.includes(query) && !guessedEnemies.has(Number(li.dataset.enemyId)) ? '' : 'none';
+                });
+            }
+
+            const enemyDropdown = document.querySelector('#enemyDropdown')
+            enemyDropdown.addEventListener('input', handleSearchbar)
+            enemyDropdown.addEventListener('focus', handleSearchbar)
+
+            document.querySelectorAll(".dropdown-item").forEach(item => {
+                item.addEventListener("mouseenter", function () {
+
+                    const image = document.getElementById("largeEnemyDisplay");
+                    image.src = item.dataset.enemyFile
+                });
+
+                item.addEventListener("click", async function () {
+                    await submitEnemy(item.dataset.enemyId)
+                });
+            });
+            /* async function  */
+            })()
+        </script>
+        <style>
+        
+        
+        </style>
+    </div>
+</body>
+</html>
+{{end}}

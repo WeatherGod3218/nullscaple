@@ -4,125 +4,197 @@
         "id" : 1,
         "name": "Bell",
         "curse_amount": 3,
-        "start_level": 1
+        "start_level": 1,
+        "kill_method": "physical",
+        "filename": "bell.png"
     },
 
     {
         "id" : 2,
         "name": "Mart",
         "curse_amount": 3,
-        "start_level": 1
+        "start_level": 1,
+        "kill_method": "physical",
+        "filename": "mart.png"
     },
 
     {
         "id" : 3,
         "name": "Baby",
         "curse_amount": 3,
-        "start_level": 1
+        "start_level": 1,
+        "kill_method": "physical",
+        "filename": "baby.png"
     },
 
     {
         "id" : 4,
         "name": "ICBM",
         "curse_amount": 3,
-        "start_level": 1
+        "start_level": 1,
+        "kill_method": "projectile",
+        "filename": "icbm.png"
     },
 
     {
         "id" : 5,
         "name": "Husk",
         "curse_amount": 7,
-        "start_level": 1
+        "start_level": 1,
+        "kill_method": "physical",
+        "filename": "husk.png"
     },
 
     {
         "id" : 6,
         "name": "Springer",
         "curse_amount": 2,
-        "start_level": 1
+        "start_level": 1,
+        "kill_method": "physical",
+        "filename": "springer.png"
     },
 
     {
         "id" : 7,
         "name": "Flesh",
         "curse_amount": 3,
-        "start_level": 5
+        "start_level": 5,
+        "kill_method": "physical",
+        "filename": "flesh.png"
     },
 
     {
         "id" : 8,
         "name": "Operator",
         "curse_amount": 1,
-        "start_level": 5
+        "start_level": 5,
+        "kill_method": "conditional",
+        "filename": "operator.png"
     },
 
     {
         "id" : 9,
         "name": "Guardian",
         "curse_amount": 2,
-        "start_level": 8
+        "start_level": 8,
+        "kill_method": "projectile",
+        "filename": "guardian.png"
     },
 
     {
         "id" : 10,
         "name": "Telefragger",
         "curse_amount": 2,
-        "start_level": 8
+        "start_level": 8,
+        "kill_method": "physical",
+        "filename": "telefragger.png"
     },
 
     {
         "id" : 11,
         "name": "Voidbound Baby",
         "curse_amount": 3,
-        "start_level": 10
+        "start_level": 10,
+        "kill_method": "physical",
+        "filename": "voidboundbaby.png"
     },
 
     {
         "id" : 12,
         "name": "Kolóna",
         "curse_amount": 2,
-        "start_level": 10
+        "start_level": 10,
+        "kill_method": "conditional",
+        "filename": "kolona.png"
     },
 
     {
         "id" : 13,
         "name": "Void Breaker",
         "curse_amount": 3,
-        "start_level": 15
+        "start_level": 15,
+        "kill_method": "projectile",
+        "filename": "voidbreaker.png"
     },
 
     {
         "id" : 14,
         "name": "Cadence",
         "curse_amount": 1,
-        "start_level": 15
+        "start_level": 15,
+        "kill_method": "physical",
+        "filename": "cadence.png"
     },
 
     {
         "id" : 15,
         "name": "Sigil",
         "curse_amount": 0,
-        "start_level": 15
+        "start_level": 15,
+        "kill_method": "projectile",
+        "filename": "sigil.png"
     },
 
     {
         "id" : 16,
         "name": "Voidbound Guardian",
         "curse_amount": 2,
-        "start_level": 20
+        "start_level": 20,
+        "kill_method": "projectile",
+        "filename": "voidboundguardian.png"
     },
 
     {
         "id" : 17,
         "name": "Scrapmaw",
-        "curse_amount": 0,
-        "start_level": 20
+        "curse_amount": 1,
+        "start_level": 20,
+        "kill_method": "???",
+        "filename": "scrapmaw.png"
     },
 
     {
         "id" : 18,
         "name": "The Celestial",
         "curse_amount": 0,
-        "start_level": 40
+        "start_level": 40,
+        "kill_method": "???",
+        "filename": "celestial.png"
+    },
+
+    {
+        "id" : 19,
+        "name": "NIL",
+        "curse_amount": 1,
+        "start_level": 5,
+        "kill_method": "physical",
+        "filename": "nil.png"
+    },
+
+    {
+        "id" : 20,
+        "name": "Ponderer",
+        "curse_amount": 0,
+        "start_level": 12,
+        "kill_method": "physical",
+        "filename": "ponderer.png"
+    },
+
+    {
+        "id" : 21,
+        "name": "Voidbound Operator",
+        "curse_amount": 0,
+        "start_level": 12,
+        "kill_method": "conditional",
+        "filename": "voidboundoperator.png"
+    },
+
+    {
+        "id" : 22,
+        "name": "Razorbloom",
+        "curse_amount": 1,
+        "start_level": 10,
+        "kill_method": "physical",
+        "filename": "razorbloom.png"
     }
 ]

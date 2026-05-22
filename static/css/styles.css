@@ -1,0 +1,42 @@
+@font-face {
+  font-family: "Nullscape Font";
+  src: url("static/fonts/accanthis-regular.otf") format("otf");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Nullscape Font";
+  src: url("static/fonts/accanthis-italic.otf") format("otf");
+  font-weight: normal;
+  font-style: italic;
+}
+
+.enemy-select-dropdown {
+  font-family: "Nullscape Font";
+}
+
+.correct-answer-background {
+  background-color: rgba(99, 180, 113, 0.555);
+}
+
+.correct-answer-text {
+  color: rgb(0, 255, 0);
+}
+
+.partial-answer-background {
+  background-color: rgba(170, 180, 75, 0.644);
+}
+
+.partial-answer-text {
+  color: rgb(251, 255, 0);
+}
+
+
+.wrong-answer-text {
+  color: rgb(255, 0, 0);
+}
+
+.wrong-answer-background {
+  background-color: rgba(116, 37, 37, 0.37);
+}
