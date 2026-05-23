@@ -3,6 +3,7 @@ package enemies
 import (
 	"encoding/json"
 	"hash/fnv"
+	"math"
 	"os"
 	"time"
 
@@ -13,33 +14,41 @@ import (
 type Comparison string
 
 const (
-	Higher Comparison = "higher"
-	Equal  Comparison = "equal"
-	Lower  Comparison = "lower"
+	Higher      Comparison = "higher"
+	High_Middle Comparison = "high-mid"
+	Equal       Comparison = "equal"
+	Low_Middle  Comparison = "low-mid"
+	Lower       Comparison = "lower"
 )
 
-var ValidModes = map[string]bool{
-	"casual":   true,
-	"standard": true,
-	"extreme":  true,
-}
-
+// Internal Enemy Data
 type EnemyData struct {
 	Id          int    `json:"id"`
 	Name        string `json:"name"`
 	CurseAmount int    `json:"curse_amount"`
 	StartLevel  int    `json:"start_level"`
+	KillMethod  string `json:"kill_method"`
+	Filename    string `json:"filename"`
 }
 
+// Internal Enemy Data
 type EnemyComparison struct {
 	Id          bool       `json:"id"`
 	Name        bool       `json:"name"`
+	KillMethod  bool       `json:"kill_method"`
 	CurseAmount Comparison `json:"curse_amount"`
 	StartLevel  Comparison `json:"start_level"`
 }
 
+type EnemyRequest struct {
+	ID   string `json:"enemy_id"`
+	Mode string `json:"gameplay_mode"`
+}
+
 var LoadedEnemies map[int]*EnemyData
-var EnemyList map[int]string
+
+const CURSES_PARTIAL_DISTANCE int = 2
+const SPAWN_PARTIAL_DISTANCE int = 5
 
 func hashString(s string) uint32 {
 	h := fnv.New32a()
@@ -47,16 +56,23 @@ func hashString(s string) uint32 {
 	return h.Sum32()
 }
 
-func compareInts(selected int, base int) Comparison {
+func compareInts(selected int, base int, partial_yield int) Comparison {
 	if selected > base {
+		if math.Abs(float64(selected-base)) < float64(partial_yield) {
+			return High_Middle
+		}
 		return Higher
 	} else if selected < base {
+		if math.Abs(float64(selected-base)) < float64(partial_yield) {
+			return Low_Middle
+		}
 		return Lower
 	}
 
 	return Equal
 }
 
+// Initializes enemy data from the enemies.json file in the root directory. Establishes loadedServerEnemies and loadedClientEnemies as their respective types
 func InitEnemies() {
 	logging.Logger.WithFields(logrus.Fields{"module": "enemies", "method": "InitEnemies"}).Info("Starting enemy loading!")
 
@@ -72,19 +88,17 @@ func InitEnemies() {
 		logging.Logger.WithFields(logrus.Fields{"error": err, "module": "enemies", "method": "InitEnemies"}).Fatal("failed to unmarshal the json!")
 	}
 
-	LoadedEnemies = make(map[int]*EnemyData)
-	EnemyList = make(map[int]string)
+	LoadedEnemies = make(map[int]*EnemyData, len(enemies))
 
 	for _, enemy := range enemies {
 		LoadedEnemies[enemy.Id] = &enemy
-		EnemyList[enemy.Id] = enemy.Name
 	}
 
 	logging.Logger.WithFields(logrus.Fields{"module": "enemies", "method": "InitEnemies"}).Info("Succesfully loaded all enemies!")
 }
 
 func GetEnemyOfTheDay(mode string) *EnemyData {
-	if len(EnemyList) == 0 {
+	if len(LoadedEnemies) == 0 {
 		logging.Logger.WithFields(logrus.Fields{"module": "enemies", "method": "GetEnemyOfTheDay"}).Warn("enemy list is empty, returning fake enemy!")
 		return nil
 	}
@@ -112,24 +126,28 @@ func GetEnemyFromId(id int) *EnemyData {
 	return nil
 }
 
-func CompareEnemies(selectedEnemy EnemyData, baseEnemy EnemyData) EnemyComparison {
+func CompareEnemies(selectedEnemy *EnemyData, baseEnemy *EnemyData) EnemyComparison {
 	return EnemyComparison{
 		Id:          selectedEnemy.Id == baseEnemy.Id,
 		Name:        selectedEnemy.Name == baseEnemy.Name,
-		CurseAmount: compareInts(selectedEnemy.CurseAmount, baseEnemy.CurseAmount),
-		StartLevel:  compareInts(selectedEnemy.StartLevel, baseEnemy.StartLevel),
+		KillMethod:  selectedEnemy.KillMethod == baseEnemy.KillMethod,
+		CurseAmount: compareInts(selectedEnemy.CurseAmount, baseEnemy.CurseAmount, CURSES_PARTIAL_DISTANCE),
+		StartLevel:  compareInts(selectedEnemy.StartLevel, baseEnemy.StartLevel, SPAWN_PARTIAL_DISTANCE),
 	}
 }
 
-func GetEnemyList() map[int]string {
-	if EnemyList == nil {
+func GetEnemyList() map[int]*EnemyData {
+	if LoadedEnemies == nil {
 		logging.Logger.WithFields(logrus.Fields{"module": "enemies", "method": "GetEnemyList"}).Warn("enemy list is empty, returning fake enemy!")
-		return make(map[int]string)
+		return nil
 	}
-	return EnemyList
+	return LoadedEnemies
 }
 
 func CheckIfStringIsMode(mode string) bool {
-	_, exists := ValidModes[mode]
-	return exists
+	switch mode {
+	case "casual", "standard", "extreme":
+		return true
+	}
+	return false
 }

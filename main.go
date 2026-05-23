@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/WeatherGod3218/nullscaple/enemies"
 	"github.com/gin-gonic/gin"
 )
@@ -12,8 +14,10 @@ func main() {
 
 	router.GET("/health", HealthCheck)
 
-	// router.StaticFS("/static", http.Dir("static"))
-	// router.LoadHTMLGlob("templates/*")
+	router.StaticFS("/static", http.Dir("static"))
+	router.LoadHTMLGlob("templates/*")
+
+	router.GET("/", GetHomePage)
 
 	router.GET("/get-enemies", GetEnemies)
 	router.POST("/guess-enemy", GuessEnemy)
