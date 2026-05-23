@@ -3,6 +3,7 @@ package enemies
 import (
 	"encoding/json"
 	"hash/fnv"
+	"math"
 	"os"
 	"time"
 
@@ -13,9 +14,11 @@ import (
 type Comparison string
 
 const (
-	Higher Comparison = "higher"
-	Equal  Comparison = "equal"
-	Lower  Comparison = "lower"
+	Higher      Comparison = "higher"
+	High_Middle Comparison = "high-mid"
+	Equal       Comparison = "equal"
+	Low_Middle  Comparison = "low-mid"
+	Lower       Comparison = "lower"
 )
 
 // Internal Enemy Data
@@ -44,16 +47,25 @@ type EnemyRequest struct {
 
 var LoadedEnemies map[int]*EnemyData
 
+const CURSES_PARTIAL_DISTANCE int = 2
+const SPAWN_PARTIAL_DISTANCE int = 5
+
 func hashString(s string) uint32 {
 	h := fnv.New32a()
 	h.Write([]byte(s))
 	return h.Sum32()
 }
 
-func compareInts(selected int, base int) Comparison {
+func compareInts(selected int, base int, partial_yield int) Comparison {
 	if selected > base {
+		if math.Abs(float64(selected-base)) < float64(partial_yield) {
+			return High_Middle
+		}
 		return Higher
 	} else if selected < base {
+		if math.Abs(float64(selected-base)) < float64(partial_yield) {
+			return Low_Middle
+		}
 		return Lower
 	}
 
@@ -119,8 +131,8 @@ func CompareEnemies(selectedEnemy *EnemyData, baseEnemy *EnemyData) EnemyCompari
 		Id:          selectedEnemy.Id == baseEnemy.Id,
 		Name:        selectedEnemy.Name == baseEnemy.Name,
 		KillMethod:  selectedEnemy.KillMethod == baseEnemy.KillMethod,
-		CurseAmount: compareInts(selectedEnemy.CurseAmount, baseEnemy.CurseAmount),
-		StartLevel:  compareInts(selectedEnemy.StartLevel, baseEnemy.StartLevel),
+		CurseAmount: compareInts(selectedEnemy.CurseAmount, baseEnemy.CurseAmount, CURSES_PARTIAL_DISTANCE),
+		StartLevel:  compareInts(selectedEnemy.StartLevel, baseEnemy.StartLevel, SPAWN_PARTIAL_DISTANCE),
 	}
 }
 
