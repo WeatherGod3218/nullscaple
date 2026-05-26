@@ -6,7 +6,7 @@ COPY go.* .
 RUN go mod download
 COPY enemies enemies
 COPY logging logging
-COPY redis /redis
+COPY redis redis
 COPY *.go .
 RUN go build -v -o nullscaple
 

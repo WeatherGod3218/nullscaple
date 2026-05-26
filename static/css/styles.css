@@ -1,3 +1,17 @@
+:root {    
+  --correct-color-bright: rgb(0, 255, 0);
+  --correct-color-dark: rgba(99, 180, 113, 0.555);
+
+  --partial-color-bright: rgb(255, 255, 0);
+  --partial-color-dark: rgba(170, 180, 75, 0.644);
+
+  --wrong-color-bright: rgb(255, 0, 0);
+  --wrong-color-dark: rgba(139, 38, 38, 0.603);
+
+  --border-size: 4px;
+  --border-style: solid;
+}
+
 @font-face {
   font-family: "Nullscape Font";
   src: url("static/fonts/accanthis-regular.otf") format("otf");
@@ -12,31 +26,55 @@
   font-style: italic;
 }
 
-.enemy-select-dropdown {
+.null-font {
   font-family: "Nullscape Font";
 }
 
+.enemy-choice-background {
+  background-color: rgb(0, 0, 0);
+}
+
 .correct-answer-background {
-  background-color: rgba(99, 180, 113, 0.555);
+  background-color: var(--correct-color-dark);
+  border-left: var(--border-size) var(--border-style) var(--correct-color-bright);
 }
 
 .correct-answer-text {
-  color: rgb(0, 255, 0);
+  color: var(--correct-color-bright);
 }
 
 .partial-answer-background {
-  background-color: rgba(170, 180, 75, 0.644);
+  background-color: var(--partial-color-dark);
+  border-left: var(--border-size) var(--border-style) var(--partial-color-bright);
 }
 
 .partial-answer-text {
-  color: rgb(251, 255, 0);
+  color: var(--partial-color-bright);
 }
 
-
 .wrong-answer-text {
-  color: rgb(255, 0, 0);
+  color: var(--wrong-color-bright);
 }
 
 .wrong-answer-background {
-  background-color: rgba(116, 37, 37, 0.37);
+  background-color: var(--wrong-color-dark);
+  border-left: var(--border-size) var(--border-style) var(--wrong-color-bright);
+}
+
+.chosen-enemies {
+  padding-left: 0;
+  padding-right: 0;
+  overflow-x: hidden;
+}
+
+.chosen-enemies li {
+  width: 100%;
+}
+
+
+.name-display {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
