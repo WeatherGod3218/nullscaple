@@ -27,15 +27,16 @@
     <nav class="navbar navbar-expand-lg bg-primary py-1 px-3">
       <div class="container-lg">
         <a class="navbar-brand text-light fs-4 d-flex align-items-center">
-          <img class="object-fit-contain me-2" height="50" src="/static/images/nullscapeBanner.png" />
+          <img class="object-fit-contain me-2" height="50" src="/static/images/nullscapeBanner.png"/>
         </a>
         <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
           <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarContent">
-        <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-2">
+        <div class="d-flex flex-row align-items-lg-center gap-2">
           <div class="nav-item dropdown order-0 order-lg-1">
+
             <button class="btn btn-link nav-link px-0 px-lg-2 dropdown-toggle d-flex align-items-center text-light" id="bd-theme" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
               <svg class="bi my-1 theme-icon-active" width="16" height="16" aria-hidden="true">
                 <use href="#circle-half"></use>
@@ -43,7 +44,8 @@
               <span class="d-lg-none ms-2" id="bd-theme-text">Toggle theme</span>
             </button>
 
-            <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="bd-theme-text">
+
+            <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="bd-theme">
               <li>
                 <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light">
                   <svg class="bi me-2" width="16" height="16" aria-hidden="true">
@@ -70,6 +72,36 @@
                     Auto
                   <svg class="bi ms-auto d-none" width="16" height="16"><use href="#check2"></use></svg>
                 </button>
+              </li>
+            </ul>
+          </div>
+
+          <div class="nav-item dropdown order-1 order-lg-1">
+            <button class="btn btn-link nav-link px-0 px-lg-2 dropdown-toggle d-flex align-items-center text-light" id="bd-difficulty" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
+              <i class="bi bi-exclamation-octagon-fill"></i>
+              <span class="d-lg-none ms-2" id="bd-difficulty-text"> Toggle Difficulty</span>
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="bd-difficulty-text">
+              <li>
+                <a class="dropdown-item d-flex align-items-center" href="/guess-screen/casual">
+                  <i class="bi bi-emoji-laughing-fill" width="16" height="16" aria-hidden="true"> </i>
+                    Casual
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item d-flex align-items-center" href="/guess-screen/standard">
+                  <i class="bi bi-emoji-neutral-fill" width="16" height="16" aria-hidden="true"> </i>
+                    Standard
+                  <svg class="bi ms-auto d-none" width="16" height="16"><use href="#check2"></use></svg>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item d-flex align-items-center" href="/guess-screen/extreme">
+                  <i class="bi bi-emoji-angry-fill" width="16" height="16" aria-hidden="true"> </i>
+                    Extreme
+                  <svg class="bi ms-auto d-none" width="16" height="16"><use href="#check2"></use></svg>
+                </a>
               </li>
             </ul>
           </div>

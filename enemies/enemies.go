@@ -58,12 +58,12 @@ func hashString(s string) uint32 {
 
 func compareInts(selected int, base int, partial_yield int) Comparison {
 	if selected > base {
-		if math.Abs(float64(selected-base)) < float64(partial_yield) {
+		if math.Abs(float64(selected-base)) <= float64(partial_yield) {
 			return High_Middle
 		}
 		return Higher
 	} else if selected < base {
-		if math.Abs(float64(selected-base)) < float64(partial_yield) {
+		if math.Abs(float64(selected-base)) <= float64(partial_yield) {
 			return Low_Middle
 		}
 		return Lower

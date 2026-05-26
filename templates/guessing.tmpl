@@ -1,27 +1,87 @@
-{{ define "index.tmpl"}}
+{{ define "guessing.tmpl"}}
 {{ template "header.tmpl" . }}
 
-<body class="min-vh-100 d-flex flex-column"> 
-    <div class="container-xl flex-grow-1 d-flex">        
-        <div class="row align-items-center justify-content-center w-100">
-            <div class="col-4 d-flex justify-content-center">
-                <a class="dropdown-item d-flex align-items-center display-1 border null-font" href="/guess-screen/casual">
-                  <i class="bi bi-emoji-laughing-fill" width="50" height="50"> </i>
-                    Casual
-                </a>
+<body>
+    <div class="container-xl">
+        <div class="row border-bottom mb-2 pb-2">
+            <div class="col-6 d-flex flex-column text-center">
+                <div class="mb-3">
+                    <div class="dropdown">
+
+                        <input 
+                            class="enemySearch mt-3 form-control w-75 mx-auto dropdown-toggle null-font" 
+                            type="text" 
+                            placeholder="Find Enemy"
+                            id="enemyDropdown"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
+
+                        <ul class="dropdown-menu w-75 overflow-auto" aria-labelledby="enemyDropdown" style="max-height: 420px;">
+
+                            {{ range $i, $enemy := .Enemies }}
+                            <li data-enemy-id="{{$enemy.Id}}">
+
+                                <button 
+                                    class="dropdown-item enemy-select-dropdown null-font d-flex align-items-center gap-2 "
+                                    data-enemy-id="{{$enemy.Id}}"
+                                    data-mode="{{$.Mode}}"
+                                    data-enemy-file="/static/images/enemies/{{$enemy.Filename}}"
+                                    type="button">
+
+                                    <img
+                                        src="/static/images/enemies/{{$enemy.Filename}}"
+                                        alt="{{$enemy.Name}}"
+                                        width="40"
+                                        height="40"
+                                        loading="lazy" 
+                                        decoding="async"
+                                        class="rounded">
+
+                                    <span class="enemy-names">{{$enemy.Name}}</span>
+
+                                </button>
+
+                            </li>
+                            {{ end }}
+
+                        </ul>
+
+                    </div>
+                </div>
             </div>
-            <div class="col-4 d-flex justify-content-center">
-                <a class="dropdown-item d-flex align-items-center display-1 border null-font" href="/guess-screen/standard">
-                  <i class="bi bi-emoji-neutral-fill" width="50" height="50"> </i>
-                    Standard
-                </a>
+            <div class="col-md-6 d-flex justify-content-center align-items-center" style="height: 420px;">
+                <img 
+                    id="largeEnemyDisplay" 
+                    src="/static/images/enemies/bell.png" 
+                    alt="Selected Enemy" 
+                    width="400" 
+                    height="400"
+                    class="rounded"
+                >
             </div>
-            <div class="col-4 d-flex justify-content-center">
-                <a class="dropdown-item d-flex align-items-center display-1 border null-font" href="/guess-screen/extreme">
-                  <i class="bi bi-emoji-angry-fill" width="50" height="50"> </i>
-                    Extreme
-                </a>
-            </div>
+        </div>
+        <div class="row g-0 border-bottom mb-2"> 
+            <ul class="chosen-enemies w-100 overflow-auto list-unstyled" style="max-height: 420px;">
+                <li>
+                    <div class="container-xl">
+                        <div class="row border w-100">
+                            <div class="col-4 d-flex justify-content-center align-items-center" style="height: 80px;">
+                                <span class="enemy-names null-font fs-3">Enemy Name</span>
+                            </div>
+                            <div class="col-2 d-flex justify-content-center align-items-center" style="height: 80px;">
+                                <span class="enemy-names null-font fs-3">Curse Amount</span>
+                            </div>
+                            <div class="col-2 d-flex justify-content-center align-items-center" style="height: 80px;">
+                                <span class="enemy-names null-font fs-3">Start Level</span>
+                            </div>
+                            <div class="col-4 d-flex justify-content-center align-items-center" style="height: 80px;">
+                                <span class="enemy-names null-font fs-3">Kill Method</span>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
         </div>
         <script>
         (() => {
@@ -100,10 +160,10 @@
                 return li;
             }
 
-            async function submitEnemy(enemyId) {
+            async function submitEnemy(enemyId, mode) {
                 try {
                     console.log(enemyId)
-                    const res = await fetch('/guess-enemy', { method: 'POST', headers:{"Content-Type":"application/json"},body: JSON.stringify({ "enemy_id": enemyId, "gameplay_mode": "casual"}) });
+                    const res = await fetch('/guess-enemy', { method: 'POST', headers:{"Content-Type":"application/json"},body: JSON.stringify({ "enemy_id": enemyId, "gameplay_mode": mode}) });
                     const data = await res.json();
                     console.log(data)
 
@@ -146,7 +206,7 @@
                 });
 
                 item.addEventListener("click", async function () {
-                    await submitEnemy(item.dataset.enemyId)
+                    await submitEnemy(item.dataset.enemyId,item.dataset.mode)
                 });
             });
             /* async function  */
