@@ -12,7 +12,6 @@ const (
 	Comparison_Lower       ComparisonResults = "lower"
 )
 
-// Internal Enemy Data
 type EnemyData struct {
 	Id          string `json:"id"`
 	Name        string `json:"name"`
@@ -22,7 +21,6 @@ type EnemyData struct {
 	Filename    string `json:"filename"`
 }
 
-// Internal Enemy Data
 type EnemyComparison struct {
 	Id          bool              `json:"id"`
 	Name        bool              `json:"name"`
@@ -34,6 +32,11 @@ type EnemyComparison struct {
 type EnemyRequest struct {
 	ID   string `json:"enemy_id"`
 	Mode string `json:"gameplay_mode"`
+}
+
+type EnemyGuess struct {
+	Enemy            *EnemyData      `json:"enemy"`
+	ComparisonResult EnemyComparison `json:"result"`
 }
 
 func ParseDifficulty(s string) (GameDifficulties, error) {

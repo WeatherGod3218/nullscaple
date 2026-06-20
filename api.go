@@ -36,9 +36,9 @@ func GuessEnemy(c *gin.Context) {
 		return
 	}
 
-	foundEnemy := enemies.GetEnemyFromId(req.ID)
-	if foundEnemy == nil {
-		logging.Logger.WithFields(logrus.Fields{"module": "api", "method": "GuessEnemy"}).Warn(fmt.Sprintf("Failed to find enemy with the id %d", req.ID))
+	foundEnemy, err := enemies.GetEnemyFromId(req.ID)
+	if err != nil {
+		logging.Logger.WithFields(logrus.Fields{"module": "api", "method": "GuessEnemy"}).Warn(fmt.Sprintf("Failed to find enemy with the id %s", req.ID))
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Unable to process the request!",
 		})
@@ -48,14 +48,14 @@ func GuessEnemy(c *gin.Context) {
 	val, exists := c.Get(database.USER_COOKIE)
 	playerId, ok := val.(string)
 	if !exists || !ok {
-		logging.Logger.WithFields(logrus.Fields{"module": "api", "method": "GuessEnemy"}).Warn(fmt.Sprintf("Failed to find the player with the id %d", playerId))
+		logging.Logger.WithFields(logrus.Fields{"module": "api", "method": "GuessEnemy"}).Warn(fmt.Sprintf("Failed to find the player with the id %s", playerId))
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Unable to process the request!",
 		})
 		return
 	}
 
-	baseEnemy, err := enemies.GetEnemyOfTheDay(req.Mode)
+	baseEnemy, err := enemies.GetEnemyOfTheDay(difficulty)
 	if err != nil {
 		logging.Logger.WithFields(logrus.Fields{"error": err, "module": "api", "method": "GuessEnemy"}).Warn("Failed to get the enemy of the day!")
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -83,6 +83,7 @@ func GuessEnemy(c *gin.Context) {
 		gamestatus = "Lose"
 		database.SetPlayerGameResult(playerId, "Lose", difficulty)
 	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"game_status": gamestatus,
 		"correct":     correct,
@@ -100,15 +101,16 @@ func GetTodaysEnemy(c *gin.Context) {
 		return
 	}
 
-	if !enemies.CheckIfStringIsMode(req.Mode) {
-		logging.Logger.WithFields(logrus.Fields{"module": "api", "method": "GetTodaysEnemy"}).Warn(fmt.Sprintf("Failed to find the gamemode marked with the %s", req.Mode))
+	difficulty, err := t.ParseDifficulty(req.Mode)
+	if err != nil {
+		logging.Logger.WithFields(logrus.Fields{"error": err, "module": "api", "method": "GetGuessScreenPage"}).Warn(fmt.Sprintf("Failed to find the gamemode marked with the %s", difficulty))
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Unable to process the request!",
 		})
 		return
 	}
 
-	baseEnemy, err := enemies.GetEnemyOfTheDay(req.Mode)
+	baseEnemy, err := enemies.GetEnemyOfTheDay(difficulty)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
@@ -139,6 +141,65 @@ func GetGuessScreenPage(c *gin.Context) {
 		"Enemies": enemyList,
 		"Mode":    mode,
 	})
+}
+
+func GetPlayerGuesses(c *gin.Context) {
+	val, exists := c.Get(database.USER_COOKIE)
+	playerId, ok := val.(string)
+	if !exists || !ok {
+		logging.Logger.WithFields(logrus.Fields{"module": "api", "method": "GetGuessScreenPage"}).Warn(fmt.Sprintf("Failed to find the player with the id %s", playerId))
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Unable to process the request!",
+		})
+		return
+	}
+
+	difficulty, err := t.ParseDifficulty(c.GetHeader("Difficulty"))
+	if err != nil {
+		logging.Logger.WithFields(logrus.Fields{"error": err, "module": "api", "method": "GetGuessScreenPage"}).Warn(fmt.Sprintf("Failed to find the gamemode marked with the %s", c.GetHeader("Difficulty")))
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Unable to process the request!",
+		})
+		return
+	}
+
+	baseEnemy, err := enemies.GetEnemyOfTheDay(difficulty)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Unable to process the request!",
+		})
+		return
+	}
+
+	guessList, err := database.GetPlayerGuesses(playerId, difficulty)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Unable to process the request!",
+		})
+		return
+	}
+
+	var enemyComparisons []t.EnemyGuess
+	for _, id := range guessList {
+		foundEnemy, err := enemies.GetEnemyFromId(id)
+		if err != nil {
+			logging.Logger.WithFields(logrus.Fields{"error": err, "module": "api", "method": "GetGuessScreenPage"}).Warn(fmt.Sprintf("Failed to find guesses for player %s", playerId))
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Unable to process the request!",
+			})
+			return
+		}
+
+		_, comparison := enemies.CompareEnemies(foundEnemy, baseEnemy)
+
+		enemyComparisons = append(enemyComparisons, t.EnemyGuess{Enemy: foundEnemy, ComparisonResult: comparison})
+	}
+
+	if enemyComparisons == nil {
+		enemyComparisons = []t.EnemyGuess{}
+	}
+
+	c.JSON(http.StatusOK, enemyComparisons)
 }
 
 func HealthCheck(c *gin.Context) {

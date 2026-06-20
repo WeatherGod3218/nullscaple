@@ -71,8 +71,40 @@ func AddPlayerGuess(player_id string, enemy_id string, difficulty t.GameDifficul
 	return remaining, nil
 }
 
-func GetPlayerGuesses(player_id string) []t.PlayerGuesses {
-	return nil
+func GetPlayerGuesses(player_id string, difficulty t.GameDifficulties) ([]string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	switch difficulty {
+	case "casual", "standard", "extreme":
+	default:
+		return nil, fmt.Errorf("invalid mode: %s", difficulty)
+	}
+
+	rows, err := db.Query(ctx, `
+		SELECT enemy_id FROM player_guesses
+		WHERE player_id = $1 AND difficulty = $2
+		ORDER BY guessed_at ASC
+	`, player_id, difficulty)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var enemyIds []string
+	for rows.Next() {
+		var enemyId string
+
+		err := rows.Scan(&enemyId)
+		if err != nil {
+			return nil, err
+		}
+
+		enemyIds = append(enemyIds, enemyId)
+	}
+
+	return enemyIds, nil
 }
 
 func InitPlayerGuesses() error {

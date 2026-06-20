@@ -84,10 +84,11 @@
             </ul>
         </div>
         <script>
-        (() => {
+        (async () => {
             'use strict'
             const guessedEnemies = new Set();
             const ROW_SIZE = "80px"
+            const chosenList = document.querySelector(".chosen-enemies");
 
             function getResultColor(item) {
                 if (typeof item === "boolean") {
@@ -167,9 +168,8 @@
                     const data = await res.json();
                     console.log(data)
 
-                    const list = document.querySelector(".chosen-enemies");
                     console.log(data.result)
-                    list.appendChild(createEnemyRow(data.enemy, data.result));
+                    chosenList.appendChild(createEnemyRow(data.enemy, data.result));
 
 
                     guessedEnemies.add(data.enemy.id)
@@ -209,8 +209,22 @@
                     await submitEnemy(item.dataset.enemyId,item.dataset.mode)
                 });
             });
-            /* async function  */
-            })()
+            
+            const playerGuesses = await fetch('/player-guesses', {
+                method: 'GET', 
+                headers:{
+                    "Content-Type":"application/json",
+                    "Difficulty":"{{ .Mode }}"
+                }}
+            );
+
+            const pgData = await playerGuesses.json();
+            pgData.forEach(g => {
+                chosenList.appendChild(createEnemyRow(g.enemy, g.result));
+                guessedEnemies.add(g.enemy.id);
+            });
+
+        })();
         </script>
         <style>
         
