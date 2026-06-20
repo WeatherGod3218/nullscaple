@@ -3,6 +3,7 @@ package enemies
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"hash/fnv"
 	"math"
 	"os"
@@ -71,14 +72,14 @@ func InitEnemies() {
 	logging.Logger.WithFields(logrus.Fields{"module": "enemies", "method": "InitEnemies"}).Info("Succesfully loaded all enemies!")
 }
 
-func GetEnemyOfTheDay(mode string) (*t.EnemyData, error) {
+func GetEnemyOfTheDay(mode t.GameDifficulties) (*t.EnemyData, error) {
 	if len(LoadedEnemies) == 0 {
 		logging.Logger.WithFields(logrus.Fields{"module": "enemies", "method": "GetEnemyOfTheDay"}).Warn("enemy list is empty!")
 		return nil, errors.New("Empty Enemy List!")
 	}
 
 	currentDay := timeutil.GetFormattedTime()
-	inputString := mode + os.Getenv("ENEMY_HASH_SALT") + currentDay
+	inputString := string(mode) + os.Getenv("ENEMY_HASH_SALT") + currentDay
 	dayHash := hashString(inputString)
 
 	listIndex := int(dayHash) % len(LoadedEnemies)
@@ -88,19 +89,19 @@ func GetEnemyOfTheDay(mode string) (*t.EnemyData, error) {
 	return foundEnemy, nil
 }
 
-func GetEnemyFromId(id string) *t.EnemyData {
+func GetEnemyFromId(id string) (*t.EnemyData, error) {
 	if LoadedEnemies == nil {
-		logging.Logger.WithFields(logrus.Fields{"module": "enemies", "method": "GetEnemyFromId"}).Warn("enemy list is empty, returning fake enemy!")
-		return nil
+		logging.Logger.WithFields(logrus.Fields{"module": "enemies", "method": "GetEnemyFromId"}).Warn("enemy map is empty!")
+		return nil, fmt.Errorf("Map has not been initalized!")
 	}
 
 	value, ok := LoadedEnemies[id]
 	if ok {
-		return value
+		return value, nil
 	}
 
 	logging.Logger.WithFields(logrus.Fields{"module": "enemies", "method": "GetEnemyFromId"}).Warn("attempted to fetch an empty Id")
-	return nil
+	return nil, fmt.Errorf("Enemy not found!")
 }
 
 func CompareEnemies(selectedEnemy *t.EnemyData, baseEnemy *t.EnemyData) (bool, t.EnemyComparison) {

@@ -37,8 +37,9 @@ func main() {
 
 	users.GET("/guess-screen/:mode", redis.RedisRateLimiter(2, 50), GetGuessScreenPage)
 	users.GET("/get-enemies", redis.RedisRateLimiter(2, 50), GetEnemies)
+	users.GET("/get-todays-enemy", redis.RedisRateLimiter(2, 50), GetTodaysEnemy)
+	users.GET("/player-guesses", redis.RedisRateLimiter(2, 50), GetPlayerGuesses)
 	users.POST("/guess-enemy", redis.RedisRateLimiter(2, 50), GuessEnemy)
-	users.GET("/get-enemy-today", redis.RedisRateLimiter(2, 50), GetTodaysEnemy)
 
 	router.Run(":8080")
 }
