@@ -3,9 +3,13 @@ package redis
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"time"
 
+	"github.com/WeatherGod3218/nullscaple/internal/logging"
+	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
+	"github.com/sirupsen/logrus"
 )
 
 const MILLISECONDS = 1000
@@ -20,9 +24,35 @@ func NewTokenBucket(rate float64, capacity float64) *TokenBucket {
 	return &TokenBucket{client: client, rate: rate, capacity: capacity}
 }
 
+func RedisRateLimiter(rate float64, capacity float64) gin.HandlerFunc {
+
+	limiter := NewTokenBucket(rate, capacity)
+
+	return func(c *gin.Context) {
+		ip := c.ClientIP()
+
+		allowed, tokens, err := limiter.Allow(c, ip)
+		if err != nil {
+			logging.Logger.WithFields(logrus.Fields{"module": "api", "method": "RedisRateLimiter"}).Warn(fmt.Sprintf("Failure in the redis cache %v", err))
+			tokens = int64(capacity)
+		} else if !allowed {
+			c.JSON(http.StatusTooManyRequests, gin.H{
+				"error": "Too many requests!",
+			})
+			c.Abort()
+			return
+		}
+
+		c.Header("X-RateLimit-Limit", fmt.Sprintf("%.0f", capacity))
+		c.Header("X-RateLimit-Remaining", fmt.Sprintf("%v", tokens))
+
+		c.Next()
+	}
+}
+
 func (tb *TokenBucket) Allow(ctx context.Context, key string) (bool, int64, error) {
 	now := time.Now().UnixMilli()
-	ipKey := fmt.Sprintf("ratelimit:%s", key)
+	ipKey := fmt.Sprintf("ratelimit: %s", key)
 
 	script := redis.NewScript(`
 		local key = KEYS[1]
@@ -41,13 +71,13 @@ func (tb *TokenBucket) Allow(ctx context.Context, key string) (bool, int64, erro
 		if tokens < 1 then
 			redis.call("HMSET", key, "tokens", tokens, "last_refill", now)
 			redis.call("PEXPIRE", key, ttl)
-			return 0
+			return {0, tokens}
 		end
 
 		tokens = tokens - 1
 		redis.call("HMSET", key, "tokens", tokens, "last_refill", now)
 		redis.call("PEXPIRE", key, ttl)
-		return {1, tokens, }
+		return {1, tokens}
 	`)
 
 	ttlMs := int64((tb.capacity / tb.rate) * MILLISECONDS * 2)

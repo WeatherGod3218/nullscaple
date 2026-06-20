@@ -4,11 +4,9 @@ WORKDIR /src/
 RUN apk add git
 COPY go.* .
 RUN go mod download
-COPY enemies enemies
-COPY logging logging
-COPY redis redis
+COPY internal internal
 COPY *.go .
-RUN go build -v -o nullscaple
+RUN go build -v -o nullscaple .
 
 FROM docker.io/alpine
 RUN apk add --no-cache tzdata
