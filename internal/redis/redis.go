@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/WeatherGod3218/nullscaple/logging"
+	"github.com/WeatherGod3218/nullscaple/internal/logging"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 )
