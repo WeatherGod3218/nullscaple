@@ -21,6 +21,7 @@ func DatabaseCookie() gin.HandlerFunc {
 			newId, err := idgen.GenerateNewId()
 
 			if err != nil {
+				logging.Logger.WithFields(logrus.Fields{"error": err, "module": "database", "method": "DatabaseCookie"}).Warn("Failed to generate a new UUID7")
 				ctx.AbortWithStatus(http.StatusInternalServerError)
 				return
 			}
@@ -31,18 +32,39 @@ func DatabaseCookie() gin.HandlerFunc {
 			ctx.SetCookie(USER_COOKIE, newId, 2147483647, "/", domain, secure, true)
 			userId = newId
 
-			CreatePlayerData(newId)
+			err = CreatePlayerData(userId)
+			if err != nil {
+				logging.Logger.WithFields(logrus.Fields{"error": err, "id": userId, "module": "database", "method": "DatabaseCookie"}).Warn("Failed to Create Player Data")
+				ctx.AbortWithStatus(http.StatusInternalServerError)
+				return
+			}
 		} else {
 			exists, err := CheckPlayerExists(userId)
 			if err != nil {
+				logging.Logger.WithFields(logrus.Fields{"error": err, "id": userId, "module": "database", "method": "DatabaseCookie"}).Warn("Failed to see if a player exists!")
 				ctx.AbortWithStatus(http.StatusInternalServerError)
+				return
 			}
 
 			if !exists {
-				CreatePlayerData(userId)
+				err = CreatePlayerData(userId)
+				if err != nil {
+					logging.Logger.WithFields(logrus.Fields{"error": err, "id": userId, "module": "database", "method": "DatabaseCookie"}).Warn("Failed to Create Player Data")
+					ctx.AbortWithStatus(http.StatusInternalServerError)
+					return
+				}
 			}
 		}
-		logging.Logger.WithFields(logrus.Fields{"id": userId, "module": "database", "method": "DatabaseCookie"}).Info("Got User Id:")
+
+		refreshed, err := RefreshPlayer(userId)
+		if err != nil {
+			logging.Logger.WithFields(logrus.Fields{"error": err, "id": userId, "module": "database", "method": "DatabaseCookie"}).Warn("Failed to Check Refresh for Player")
+			ctx.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		if refreshed {
+			//TODO
+		}
 
 		ctx.Set(USER_COOKIE, userId)
 		ctx.Next()
