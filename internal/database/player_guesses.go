@@ -11,11 +11,11 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func AddPlayerGuess(player_id string, enemy_id string, difficulty t.GameDifficulties) (int, error) {
+func AddPlayerGuess(playerId string, enemyId string, difficulty t.GameDifficulties) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	row_id, err := idgen.GenerateNewId()
+	rowId, err := idgen.GenerateNewId()
 	if err != nil {
 		return 0, err
 	}
@@ -47,7 +47,7 @@ func AddPlayerGuess(player_id string, enemy_id string, difficulty t.GameDifficul
 	defer transaction.Rollback(ctx)
 
 	var remaining int
-	err = transaction.QueryRow(ctx, query, player_id).Scan(&remaining)
+	err = transaction.QueryRow(ctx, query, playerId).Scan(&remaining)
 	if err != nil {
 		return 0, err
 	}
@@ -58,7 +58,7 @@ func AddPlayerGuess(player_id string, enemy_id string, difficulty t.GameDifficul
 	_, err = transaction.Exec(ctx, `
 		INSERT INTO player_guesses (id, player_id, difficulty, enemy_id, day)
 		VALUES ($1, $2, $3, $4, $5)
-	`, row_id, player_id, difficulty, enemy_id, timeutil.GetFormattedTime())
+	`, rowId, playerId, difficulty, enemyId, timeutil.GetFormattedTime())
 	if err != nil {
 		return 0, err
 	}
@@ -71,7 +71,7 @@ func AddPlayerGuess(player_id string, enemy_id string, difficulty t.GameDifficul
 	return remaining, nil
 }
 
-func GetPlayerGuesses(player_id string, difficulty t.GameDifficulties) ([]string, error) {
+func GetPlayerGuesses(playerId string, difficulty t.GameDifficulties) ([]string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -85,7 +85,7 @@ func GetPlayerGuesses(player_id string, difficulty t.GameDifficulties) ([]string
 		SELECT enemy_id FROM player_guesses
 		WHERE player_id = $1 AND difficulty = $2
 		ORDER BY guessed_at ASC
-	`, player_id, difficulty)
+	`, playerId, difficulty)
 
 	if err != nil {
 		return nil, err

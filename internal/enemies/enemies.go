@@ -26,14 +26,14 @@ func hashString(s string) uint32 {
 	return h.Sum32()
 }
 
-func compareInts(selected int, base int, partial_yield int) t.ComparisonResults {
+func compareInts(selected int, base int, partialYield int) t.ComparisonResults {
 	if selected > base {
-		if math.Abs(float64(selected-base)) <= float64(partial_yield) {
+		if math.Abs(float64(selected-base)) <= float64(partialYield) {
 			return t.Comparison_High_Middle
 		}
 		return t.Comparison_Higher
 	} else if selected < base {
-		if math.Abs(float64(selected-base)) <= float64(partial_yield) {
+		if math.Abs(float64(selected-base)) <= float64(partialYield) {
 			return t.Comparison_Low_Middle
 		}
 		return t.Comparison_Lower
