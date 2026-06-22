@@ -11,7 +11,7 @@ var loc *time.Location
 
 func init() {
 	var err error
-	loc, err = time.LoadLocation("America/Chicago")
+	loc, err = time.LoadLocation("America/New_York")
 	if err != nil {
 		logging.Logger.WithFields(logrus.Fields{"error": err, "module": "database", "method": "DatabaseCookie"}).Fatal("Failed to load timezone!")
 	}
